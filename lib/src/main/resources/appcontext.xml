@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+     
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/tx
+        	http://www.springframework.org/schema/tx/spring-tx.xsd">
+          
+          <context:annotation-config />
+     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+     	<property name="driverClassName" value="org.postgresql.Driver"></property>
+     	<property name="url" value="jdbc:postgresql://localhost:5432/softdb"></property>
+     	<property name="username" value="soft"></property>
+     	<property name="password" value="soft123"></property>
+     </bean>
+     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="packagesToScan" value="com.abc.entity" />
+    <property name="persistenceProviderClass" value="org.hibernate.jpa.HibernatePersistenceProvider"></property>
+    <property name="jpaPropertyMap">
+    	<map>
+    		<entry key="hibernate.hbm2ddl.auto" value="update"></entry>
+    		<entry key="hibernate.show_sql" value="true"></entry>
+    	</map>
+    </property>
+    </bean>
+   	
+   	<bean id="txnManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+   		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="txnManager"></tx:annotation-driven>
+	
+	<bean id="pdao" class="com.abc.dao.ProductDaoImpl"></bean>
+	
+	<bean id="pservice" class="com.abc.service.ProductServiceImpl">
+		<property name="productDao" ref="pdao"></property>
+	</bean>
+	
+	<bean id="pController" class="com.abc.controller.ProductController">
+		<property name="productService" ref="pservice"></property>
+	</bean>
+	
+</beans>
